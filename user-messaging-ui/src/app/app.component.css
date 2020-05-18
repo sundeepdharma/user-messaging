@@ -1,0 +1,7 @@
+a.logout {
+  cursor: pointer;
+}
+
+a.logout:hover {
+  text-decoration: underline;
+}

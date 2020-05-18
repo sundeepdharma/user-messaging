@@ -1,0 +1,57 @@
+<div class="text-center">
+  <form
+    class="form-signin"
+    name="login"
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+  >
+    <h1 class="h3 mb-3 font-weight-normal">Sign in</h1>
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+      Invalid credentials
+    </div>
+    <label for="inputUsername" class="sr-only">Username</label>
+    <input
+      type="text"
+      id="inputUsername"
+      formControlName="username"
+      [ngClass]="{ 'is-invalid': submitted && login.username.errors }"
+      class="form-control"
+      placeholder="Username"
+      required
+      autofocus
+    />
+    <div *ngIf="submitted && login.username.errors" class="invalid-feedback">
+      <div *ngIf="login.username.errors.required">Username is required</div>
+      <div *ngIf="login.username.errors.minlength">
+        Username must be at least 4 characters
+      </div>
+      <div *ngIf="login.username.errors.maxlength">
+        Username must be at max 100 characters
+      </div>
+    </div>
+    <label for="inputPassword" class="sr-only">Password</label>
+    <input
+      type="password"
+      id="inputPassword"
+      formControlName="password"
+      [ngClass]="{ 'is-invalid': submitted && login.password.errors }"
+      class="form-control"
+      placeholder="Password"
+      required
+    />
+    <div *ngIf="submitted && login.password.errors" class="invalid-feedback">
+      <div *ngIf="login.password.errors.required">password is required</div>
+      <div *ngIf="login.password.errors.minlength">
+        Password must be at least 8 characters
+      </div>
+      <div *ngIf="login.password.errors.maxlength">
+        Password must be at max 100 characters
+      </div>
+    </div>
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">
+      Sign in
+    </button>
+    <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
+  </form>
+</div>

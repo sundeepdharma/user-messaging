@@ -1,0 +1,271 @@
+<div class="container-fluid">
+  <div class="row my-1">
+    <div class="col-12">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="addUser()"
+        data-toggle="modal"
+        data-target="#userModal"
+        *ngIf="isAdmin"
+      >
+        Add User
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <table class="table table-striped table-bordered table-responsive">
+        <thead>
+          <tr>
+            <th scope="col">Username</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Created Date</th>
+            <th scope="col">Updated Date</th>
+            <th scope="col">Enable</th>
+            <th scope="col">Roles</th>
+            <th scope="col">Edit</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="isAdmin">
+          <tr *ngFor="let user of users">
+            <th scope="row">{{ user.username }}</th>
+            <td>{{ user.firstName }}</td>
+            <td>{{ user.lastName }}</td>
+            <td>{{ user.createdTime | date: "yyyy-MM-dd" }}</td>
+            <td>{{ user.updatedTime | date: "yyyy-MM-dd" }}</td>
+            <td>{{ user.enabled ? "Enabled" : "Disabled" }}</td>
+            <td>{{ user.roles }}</td>
+            <td>
+              <a
+                (click)="populateUserForm(user)"
+                class="user-edit"
+                data-toggle="modal"
+                data-target="#userModal"
+                >Edit</a
+              >
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="!isAdmin">
+          <tr>
+            <th scope="row">{{ loggedInUser.username }}</th>
+            <td>{{ loggedInUser.firstName }}</td>
+            <td>{{ loggedInUser.lastName }}</td>
+            <td>{{ loggedInUser.createdTime | date: "yyyy-MM-dd" }}</td>
+            <td>{{ loggedInUser.updatedTime | date: "yyyy-MM-dd" }}</td>
+            <td>{{ loggedInUser.enabled ? "Enabled" : "Disabled" }}</td>
+            <td>{{ loggedInUser.roles }}</td>
+            <td>
+              <a
+                (click)="populateUserForm(loggedInUser)"
+                class="user-edit"
+                data-toggle="modal"
+                data-target="#userModal"
+                >Edit</a
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="userModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="userModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <form
+      name="userFormControls"
+      [formGroup]="userForm"
+      (ngSubmit)="onSubmit()"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userModalLabel">{{ userLabel }} User</h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row" *ngIf="alertEnable">
+            <div class="col">
+              <div
+                class="alert"
+                [ngClass]="{
+                  'alert-success': updateResult,
+                  'alert-danger': !updateResult
+                }"
+                role="alert"
+              >
+                {{ updateText }}
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col">
+              <div class="form-group">
+                <label class="col-form-label">Username</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="username"
+                  [attr.disabled]="!isAdd ? '' : null"
+                  [ngClass]="{
+                    'is-invalid': submitted && userFormControls.username.errors
+                  }"
+                />
+                <div
+                  *ngIf="submitted && userFormControls.username.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="userFormControls.username.errors.required">
+                    Username is empty
+                  </div>
+                  <div *ngIf="userFormControls.username.errors.minlength">
+                    Username must be at min 4 characters
+                  </div>
+                  <div *ngIf="userFormControls.username.errors.maxlength">
+                    Username must be at max 100 characters
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group" *ngIf="enablePassword">
+                <label class="col-form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  formControlName="password"
+                  [ngClass]="{
+                    'is-invalid': submitted && userFormControls.password.errors
+                  }"
+                />
+                <div
+                  *ngIf="submitted && userFormControls.password.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="userFormControls.password.errors.required">
+                    Password is empty
+                  </div>
+                  <div *ngIf="userFormControls.password.errors.minlength">
+                    Password must be at min 8 characters
+                  </div>
+                  <div *ngIf="userFormControls.password.errors.maxlength">
+                    Password must be at max 100 characters
+                  </div>
+                </div>
+              </div>
+              <a (click)="showPassword()" class="user-edit">Update Password</a>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col">
+              <div class="form-group">
+                <label class="col-form-label">Last Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="firstName"
+                  [ngClass]="{
+                    'is-invalid': submitted && userFormControls.firstName.errors
+                  }"
+                />
+                <div
+                  *ngIf="submitted && userFormControls.firstName.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="userFormControls.firstName.errors.required">
+                    Password is empty
+                  </div>
+                  <div *ngIf="userFormControls.firstName.errors.maxlength">
+                    Password must be at max 100 characters
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label class="col-form-label">First Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="lastName"
+                  [ngClass]="{
+                    'is-invalid': submitted && userFormControls.lastName.errors
+                  }"
+                />
+                <div
+                  *ngIf="submitted && userFormControls.lastName.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="userFormControls.lastName.errors.required">
+                    Password is empty
+                  </div>
+                  <div *ngIf="userFormControls.lastName.errors.maxlength">
+                    Password must be at max 100 characters
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col">
+              <div class="form-group">
+                <label class="col-form-label">Enabled</label>
+                <select
+                  class="form-control"
+                  formControlName="enabled"
+                  [attr.disabled]="!isAdmin ? '' : null"
+                  ><option
+                    *ngFor="let enabledOption of enabledOptions"
+                    [ngValue]="enabledOption.value"
+                    >{{ enabledOption.label }}</option
+                  ></select
+                >
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label class="col-form-label">Roles</label>
+                <select
+                  multiple
+                  [attr.disabled]="!isAdmin ? '' : null"
+                  size="2"
+                  class="form-control"
+                  formControlName="roles"
+                  ><option
+                    *ngFor="let roleOption of roleOptions"
+                    [ngValue]="roleOption"
+                    >{{ roleOption }}</option
+                  ></select
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <button type="button" class="btn btn-primary" type="submit">
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
